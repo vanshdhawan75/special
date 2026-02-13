@@ -1,0 +1,46 @@
+
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+
+const app = express();
+const PORT = 5000;
+
+
+app.use(cors());
+app.use(bodyParser.json());
+
+
+let pickupRequests = [];
+
+
+app.get("/", (req, res) => {
+  res.send("Smart Waste Pickup Scheduler Backend Running!");
+});
+
+app.post("/api/pickup", (req, res) => {
+  const { name, address, wasteType, date } = req.body;
+
+  if (!name || !address || !wasteType || !date) {
+    return res.status(400).json({ message: "Missing fields!" });
+  }
+
+  const newRequest = {
+    id: pickupRequests.length + 1,
+    name,
+    address,
+    wasteType,
+    date,
+  };
+
+  pickupRequests.push(newRequest);
+  res.status(201).json({ message: "Pickup scheduled successfully!", data: newRequest });
+});
+
+app.get("/api/pickups", (req, res) => {
+  res.json(pickupRequests);
+});
+
+app.listen(PORT, () => {
+  console.log(`✅ Server running at http://localhost:${PORT}`);
+});
